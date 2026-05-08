@@ -1,6 +1,6 @@
 package org.example.view;
 
-import org.example.utils.TransmitThread;
+import org.example.utils.Transmit;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,14 +21,11 @@ public class CenterPanel extends JPanel {
     private void initLabel(){
         jLabel.setFont(new Font("Serif",Font.PLAIN,20));
     }
-    public static void generateThread(int tempData){
-        TransmitThread thread=new TransmitThread(tempData);
-        thread.start();
-        try{
-            thread.join();
-        }catch (InterruptedException e){
-            e.printStackTrace();
-        }
+    public static void generateTransmit(int tempData){
+        Transmit thread=new Transmit(tempData);
+        thread.run();
+        System.out.println("start");
+
     }
 
 }

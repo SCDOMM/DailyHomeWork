@@ -77,25 +77,25 @@ public class LeftPanel extends JPanel {
 
     private void initEvent() {
         pickBtn.addActionListener(event -> {
-            if (pickText.getText().isEmpty()){
+            if (pickText.getText().isEmpty()) {
                 DialogUtil.generateDialog("请输入数值！");
                 return;
             }
             pickTerm = Integer.parseInt(pickText.getText());
-            System.out.println("pickTerm:"+pickTerm);
+            System.out.println("pickTerm:" + pickTerm);
         });
         sendBtn.addActionListener(event -> {
-            if (sendText.getText().isEmpty()){
+            if (sendText.getText().isEmpty()) {
                 DialogUtil.generateDialog("请输入数值！");
                 return;
             }
             sendTerm = Integer.parseInt(sendText.getText());
-            System.out.println("sendTerm:"+sendTerm);
+            System.out.println("sendTerm:" + sendTerm);
         });
 
         initPickAct();
         changePickBtn.addActionListener(event -> {
-            if (pickText.getText().isEmpty()){
+            if (pickText.getText().isEmpty()) {
                 DialogUtil.generateDialog("请输入采集周期！");
                 return;
             }
@@ -107,15 +107,19 @@ public class LeftPanel extends JPanel {
 
         initSendAct();
         changeSendBtn.addActionListener(event -> {
-            if (sendText.getText().isEmpty()){
+            if (sendText.getText().isEmpty()) {
                 DialogUtil.generateDialog("请输入发送周期！");
                 return;
             }
-            if (dataText.getText().isEmpty()){
+            if (dataText.getText().isEmpty()) {
                 DialogUtil.generateDialog("温度数据为空！");
                 return;
             }
             isRunning2 = !isRunning2;
+            ShareResource.isRunning=!ShareResource.isRunning;
+            synchronized (ShareResource.LOCK) {
+                if (ShareResource.isRunning) ShareResource.LOCK.notify();
+            }
             synchronized (lock2) {
                 lock2.notify();
             }
@@ -162,12 +166,20 @@ public class LeftPanel extends JPanel {
                         }
                     }
                 }
-
-                CenterPanel.generateThread(Integer.parseInt(dataText.getText()));
-                try {
-                    Thread.sleep(sendTerm);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                while (true) {
+                    synchronized (ShareResource.LOCK) {
+                        CenterPanel.generateTransmit(Integer.parseInt(dataText.getText()));
+                        try {
+                            ShareResource.LOCK.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            Thread.sleep(sendTerm);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         });
