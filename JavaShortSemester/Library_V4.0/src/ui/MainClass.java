@@ -1,8 +1,6 @@
 package ui;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Scanner;
+import java.util.*;
 
 import model.Book;
 import model.BookOperation;
@@ -20,11 +18,13 @@ public class MainClass implements BookOperation {
             System.out.println("===============================");
             System.out.println("欢迎来到图书管理系统！");
             System.out.println("1. 添加图书");
-            System.out.println("2. 删除图书");
-            System.out.println("3. 修改图书");
-            System.out.println("4. 查询图书");
-            System.out.println("5. 显示所有图书");
-            System.out.println("6. 关于系统");
+            System.out.println("2. 添加多本图书");
+            System.out.println("3. 删除图书");
+            System.out.println("4. 修改图书");
+            System.out.println("5. 查询图书");
+            System.out.println("6. 显示所有图书");
+            System.out.println("7. 按照价格排序图书");
+            System.out.println("8. 关于系统");
             System.out.println("0. 退出系统");
             System.out.println("===============================");
             System.out.print("请选择：");
@@ -43,18 +43,24 @@ public class MainClass implements BookOperation {
                     addBook();
                     break;
                 case 2:
-                    deleteBook();
+                    addBooks();
                     break;
                 case 3:
-                    changeBook();
+                    deleteBook();
                     break;
                 case 4:
-                    searchBook();
+                    changeBook();
                     break;
                 case 5:
-                    showAllBooks();
+                    searchBook();
                     break;
                 case 6:
+                    showAllBooks();
+                    break;
+                case 7:
+                    sortByPrice();
+                    break;
+                case 8:
                 System.out.println("当前版本：4.0");
                 break;
                 case 0:
@@ -86,6 +92,26 @@ public class MainClass implements BookOperation {
         System.out.println("系统目前的书籍数为：" + bookList.size() + "本。");
     }
 
+    public void addBooks(){
+        System.out.println("\n===== 添加多本图书 =====");
+        System.out.print("请输入添加数目：");
+        int number = Integer.parseInt(scanner.nextLine());
+        if (number<0||number>10){
+            System.out.println("数目错误！请重试！");
+        }
+        for (int i=0;i<number;i++) {
+            System.out.print("请输入第"+(i+1)+"本书书名：");
+            String name = scanner.nextLine();
+            System.out.print("请输入第"+(i+1)+"本书作者：");
+            String author = scanner.nextLine();
+            System.out.print("请输入第"+(i+1)+"本书价格：");
+            double price =Double.parseDouble(scanner.nextLine());
+            bookList.add(new Book(name,author,price));
+        }
+        System.out.println("添加完毕！");
+    }
+
+
     @Override
     public void deleteBook() {
         if (bookList.isEmpty()) {
@@ -103,7 +129,6 @@ public class MainClass implements BookOperation {
             }
         }
         System.out.println("未找到相关书籍！");
-
     }
 
     @Override
@@ -166,6 +191,14 @@ public class MainClass implements BookOperation {
         for (Book book : bookList) {
             System.out.println("  " + book);
         }
+    }
+
+    public void sortByPrice(){
+        if (bookList.isEmpty()) {
+            System.out.println("系统为空，没有可查询的书籍！");
+            return;
+        }
+        Collections.sort(bookList, (o1, o2) -> (int) (o1.getPrice()-o2.getPrice()));
     }
 
     public static void main(String[] args) {
