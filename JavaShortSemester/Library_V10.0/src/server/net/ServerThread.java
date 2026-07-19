@@ -24,7 +24,9 @@ public class ServerThread implements Runnable {
 
     @Override
     public void run() {
+
         try {
+            socket.setSoTimeout(4000);
             System.out.println("【线程" + Thread.currentThread().getId() + "】开始服务客户端 " + socket.getRemoteSocketAddress());
 
             try (DataInputStream dis = new DataInputStream(socket.getInputStream());
@@ -149,6 +151,24 @@ public class ServerThread implements Runnable {
                             }
                         } catch (Exception e) {
                             System.out.println("【线程" + Thread.currentThread().getId() + "】处理showall命令异常：" + e.getMessage());
+                            e.printStackTrace();
+                            dos.writeUTF("服务器处理异常：" + e.getMessage());
+                        }
+                    }
+                    else if (head.equals("searchAuthor")){
+                        try {
+                            Operator operator = new Operator();
+                            Book book = operator.searchBookByAuthor(body);
+
+                            if (book == null) {
+                                dos.writeUTF("未找到");
+                            } else {
+                                dos.writeUTF(book.getName() + ","
+                                        + book.getAuthor() + ","
+                                        + book.getPrice());
+                            }
+                        } catch (Exception e) {
+                            System.out.println("处理search命令异常：" + e.getMessage());
                             e.printStackTrace();
                             dos.writeUTF("服务器处理异常：" + e.getMessage());
                         }

@@ -18,6 +18,7 @@ public class Parser {
         if (response == null || response.contains("未找到")) {
             return null;
         }
+        System.out.println(response);
         String[] parts = response.split(",");
         String bookName = parts[0];
         String author = parts[1];
